@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Agent {
+  id         String   @id @default(cuid())
+  subdomain  String   @unique 
+  name       String
+  phone      String?
+  officialId String?  // ID Rujukan Rasmi dari App Eastel
+  password   String   
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Content {
+  id             String   @id @default(cuid())
+  headline       String
+  subheadline    String
+  description    String
+  paymentDetails String   // Maklumat Bank (cth: Maybank 12345678 - Ali)
+  webhookUrl     String?  // URL Webhook untuk ke Google Sheets (cth: Zapier/Make)
+  updatedAt      DateTime @updatedAt
+}
