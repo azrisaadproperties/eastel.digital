@@ -15,12 +15,14 @@ export default async function AdminDashboard() {
   // Jika login, load semua data HQ
   const agents = await prisma.agent.findMany({ orderBy: { createdAt: 'desc' } })
   const content = await prisma.content.findFirst()
+  const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }) // Load top 100 latest orders
 
   return (
     <AdminDashboardClient 
       isAuthenticated={true} 
       agents={agents} 
       content={content} 
+      orders={orders}
     />
   )
 }

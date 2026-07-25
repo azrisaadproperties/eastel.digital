@@ -2,8 +2,15 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import CheckoutClient from './CheckoutClient'
 
-export default async function CheckoutPage({ params }: { params: Promise<{ tenant: string }> }) {
+export default async function CheckoutPage({ 
+  params,
+  searchParams
+}: { 
+  params: Promise<{ tenant: string }>,
+  searchParams: Promise<{ plan?: string }>
+}) {
   const { tenant } = await params
+  const { plan } = await searchParams
   
   const agent = await prisma.agent.findUnique({
     where: { subdomain: tenant }
@@ -20,7 +27,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ tenan
         agentSubdomain={agent.subdomain}
         agentName={agent.name}
         agentPhone={agent.phone}
-        paymentDetails={paymentDetails} 
+        paymentDetails={paymentDetails}
+        plan={plan || 'unknown'} 
       />
     </main>
   )

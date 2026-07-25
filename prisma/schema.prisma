@@ -28,3 +28,14 @@ model Content {
   webhookUrl     String?  // URL Webhook untuk ke Google Sheets (cth: Zapier/Make)
   updatedAt      DateTime @updatedAt
 }
+
+model Order {
+  id              String   @id @default(cuid())
+  name            String
+  phone           String
+  address         String
+  plan            String   @default("unknown") // cth: ez50, ez68
+  agentSubdomain  String
+  agentOfficialId String?
+  createdAt       DateTime @default(now())
+}

@@ -5,15 +5,18 @@ import { addAgent, deleteAgent, updateContent, loginAdmin, logoutAdmin } from '.
 
 type Agent = { id: string, subdomain: string, name: string, phone: string | null, officialId: string | null, createdAt: Date }
 type Content = { id: string, headline: string, subheadline: string, description: string, paymentDetails: string, webhookUrl: string | null }
+type Order = { id: string, name: string, phone: string, address: string, plan: string, agentSubdomain: string, agentOfficialId: string | null, createdAt: Date }
 
 export default function AdminDashboardClient({ 
   isAuthenticated, 
   agents, 
-  content 
+  content,
+  orders = []
 }: { 
   isAuthenticated: boolean, 
   agents: Agent[], 
-  content: Content | null 
+  content: Content | null,
+  orders?: Order[]
 }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -81,9 +84,48 @@ export default function AdminDashboardClient({
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 600 }}>Jumlah Ejen</p>
             <div style={{ fontSize: '2.5rem', fontWeight: 900 }}>{agents.length}</div>
           </div>
+          <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid #f59e0b' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 600 }}>Total Tempahan</p>
+            <div style={{ fontSize: '2.5rem', fontWeight: 900 }}>{orders.length}</div>
+          </div>
           <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid #8b5cf6' }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 600 }}>Sistem Teras</p>
             <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#10b981' }}>Aktif</div>
+          </div>
+        </div>
+
+        {/* Bahagian Tempahan (Orders) */}
+        <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
+          <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            📦 Senarai Tempahan Pelanggan
+          </h2>
+          <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {orders.map(order => (
+              <div key={order.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'inline-block', background: 'var(--gradient-5g)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>
+                    {order.plan.toUpperCase()}
+                  </div>
+                  <strong style={{ fontSize: '1.1rem', display: 'block', marginBottom: '0.3rem' }}>{order.name}</strong> 
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                    📱 {order.phone}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
+                    🏠 {order.address}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', minWidth: '150px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                    {new Date(order.createdAt).toLocaleString('ms-MY')}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', background: 'var(--bg-secondary)', padding: '0.4rem', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                    Ejen: <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{order.agentSubdomain}</span>
+                    {order.agentOfficialId && <div style={{ fontSize: '0.75rem', marginTop: '0.2rem' }}>ID: {order.agentOfficialId}</div>}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {orders.length === 0 && <p style={{ color: 'var(--text-muted)' }}>Tiada tempahan direkodkan lagi.</p>}
           </div>
         </div>
 

@@ -7,12 +7,14 @@ export default function CheckoutClient({
   agentSubdomain, 
   agentName,
   agentPhone,
-  paymentDetails 
+  paymentDetails,
+  plan
 }: { 
   agentSubdomain: string, 
   agentName: string,
   agentPhone: string | null,
-  paymentDetails: string 
+  paymentDetails: string,
+  plan: string 
 }) {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -25,6 +27,7 @@ export default function CheckoutClient({
     
     const formData = new FormData(e.currentTarget)
     formData.append('agentSubdomain', agentSubdomain)
+    formData.append('plan', plan)
     
     const res = await submitCheckoutForm(formData)
     
@@ -62,7 +65,13 @@ export default function CheckoutClient({
   return (
     <div className="glass" style={{ padding: '2rem', borderRadius: '24px' }}>
       <h1 style={{ fontSize: '1.8rem', textAlign: 'center', marginBottom: '0.5rem' }}>Pengesahan Tempahan</h1>
-      <p style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--text-muted)' }}>Lengkapkan butiran untuk proses penghantaran.</p>
+      <p style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-muted)' }}>Lengkapkan butiran untuk proses penghantaran.</p>
+      
+      {plan !== 'unknown' && (
+        <div style={{ background: 'var(--gradient-5g)', padding: '1rem', borderRadius: '12px', textAlign: 'center', color: 'white', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2rem', fontSize: '1.2rem' }}>
+          Pakej Pilihan: {plan}
+        </div>
+      )}
       
       {/* Maklumat Bank */}
       <div style={{ background: 'var(--primary)', color: 'white', padding: '1.5rem', borderRadius: '16px', marginBottom: '2rem' }}>
