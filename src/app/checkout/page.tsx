@@ -1,7 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import CheckoutClient from '@/app/[tenant]/checkout/CheckoutClient'
 
-export default async function HQCheckoutPage() {
+export default async function HQCheckoutPage({ 
+  searchParams
+}: { 
+  searchParams: Promise<{ plan?: string }>
+}) {
+  const { plan } = await searchParams
   const content = await prisma.content.findFirst()
   const paymentDetails = content?.paymentDetails || 'Sila hubungi HQ untuk maklumat pembayaran.'
 
@@ -14,7 +19,8 @@ export default async function HQCheckoutPage() {
         agentSubdomain="hq_pusat"
         agentName="HQ Eastel Digital"
         agentPhone="60199999999" 
-        paymentDetails={paymentDetails} 
+        paymentDetails={paymentDetails}
+        plan={plan || 'unknown'} 
       />
     </main>
   )
