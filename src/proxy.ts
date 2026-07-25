@@ -11,8 +11,10 @@ export function proxy(request: NextRequest) {
   hostname = hostname.replace(/:\d+$/, '')
 
   // Tentukan root domain
-  // Dalam production, ini akan menjadi 'eastel.digital'
-  const rootDomain = process.env.NODE_ENV === 'production' ? 'eastel.digital' : 'localhost'
+  // Benarkan .vercel.app beroperasi sebagai domain utama untuk tujuan pengujian sementara DNS bertukar
+  const rootDomain = process.env.NODE_ENV === 'production' 
+    ? (hostname.includes('vercel.app') ? hostname : 'eastel.digital') 
+    : 'localhost'
 
   // Cari subdomain
   // Jika hostname adalah ali.localhost, subdomain = 'ali'
