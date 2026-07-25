@@ -8,7 +8,7 @@ export async function addAgent(formData: FormData) {
   const name = formData.get('name') as string
   const phone = formData.get('phone') as string
   
-  if (!subdomain || !name) return { error: 'Subdomain dan Nama diperlukan.' }
+  if (!subdomain || !name) return
 
   try {
     await prisma.agent.create({
@@ -20,9 +20,8 @@ export async function addAgent(formData: FormData) {
       }
     })
     revalidatePath('/admin')
-    return { success: true }
   } catch (error) {
-    return { error: 'Gagal menambah ejen. Subdomain mungkin sudah wujud.' }
+    console.error('Gagal menambah ejen', error)
   }
 }
 
@@ -30,9 +29,8 @@ export async function deleteAgent(id: string) {
   try {
     await prisma.agent.delete({ where: { id } })
     revalidatePath('/admin')
-    return { success: true }
   } catch (error) {
-    return { error: 'Gagal memadam ejen.' }
+    console.error('Gagal memadam ejen', error)
   }
 }
 
@@ -44,7 +42,7 @@ export async function updateContent(formData: FormData) {
   const paymentDetails = formData.get('paymentDetails') as string
   const webhookUrl = formData.get('webhookUrl') as string
 
-  if (!id) return { error: 'ID Kandungan tidak sah.' }
+  if (!id) return
 
   try {
     await prisma.content.update({
@@ -53,8 +51,7 @@ export async function updateContent(formData: FormData) {
     })
     revalidatePath('/admin')
     revalidatePath('/', 'layout') // revalidate semua page
-    return { success: true }
   } catch (error) {
-    return { error: 'Gagal mengemaskini kandungan.' }
+    console.error('Gagal mengemaskini kandungan', error)
   }
 }
