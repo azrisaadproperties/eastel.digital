@@ -1,6 +1,35 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
+  const { tenant } = await params
+  const agent = await prisma.agent.findUnique({
+    where: { subdomain: tenant },
+  })
+
+  if (!agent) {
+    return {
+      title: 'Kedai Tidak Ditemui',
+      alternates: {
+        canonical: 'https://eastel.digital'
+      }
+    }
+  }
+
+  return {
+    title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
+    description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
+    alternates: {
+      canonical: 'https://eastel.digital' // Elakkan duplicate content SEO penalty!
+    },
+    openGraph: {
+      title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
+      description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
+    }
+  }
+}
 
 export default async function AgentPage({ params }: { params: Promise<{ tenant: string }> }) {
   const { tenant } = await params
