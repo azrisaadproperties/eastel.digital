@@ -22,7 +22,7 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
       <main>
         {/* Agent Exclusive Banner */}
         <div style={{ background: 'var(--gradient-5g)', padding: '0.5rem 1rem', textAlign: 'center', color: 'white', fontWeight: 600, position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-          Pembelian Melalui Wakil Sah: <span style={{ fontWeight: 900 }}>{agent.name.toUpperCase()}</span>
+          Pembelian Melalui Wakil Sah: <span style={{ fontWeight: 900 }}>{agent.name.toUpperCase()} {agent.officialId ? `(${agent.officialId})` : ''}</span>
         </div>
 
         {/* Hero Section */}
@@ -39,7 +39,12 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
               {agent.name.charAt(0).toUpperCase()}
             </div>
             <p style={{ color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>Rakan Niaga Eastel</p>
-            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{agent.name}</h1>
+            <h1 style={{ fontSize: '2rem', marginBottom: '0.2rem' }}>{agent.name}</h1>
+            {agent.officialId && (
+              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.8rem', borderRadius: '12px', fontSize: '0.8rem', color: 'var(--text-main)', marginBottom: '1rem', border: '1px solid rgba(255,255,255,0.2)' }}>
+                ID: {agent.officialId}
+              </div>
+            )}
             <p style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>"Saya sedia membantu anda mendaftar pelan Eastel 5G hari ini."</p>
           </div>
           
