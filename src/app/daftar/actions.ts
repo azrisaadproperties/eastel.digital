@@ -28,7 +28,7 @@ export async function registerAgent(formData: FormData) {
   }
 
   try {
-    // Semak jika subdomain sudah wujud - HANYA SELECT 'id' supaya tidak ralat jika kolum baru belum wujud di DB
+    // Semak jika subdomain sudah wujud
     const existing = await prisma.agent.findUnique({
       where: { subdomain },
       select: { id: true }
@@ -38,30 +38,17 @@ export async function registerAgent(formData: FormData) {
       return { error: `Maaf, nama pautan "${subdomain}.eastel.digital" telah digunakan. Sila pilih nama lain.` }
     }
 
-    // Cipta ejen baru dengan fail-safe fallback
-    try {
-      await prisma.agent.create({
-        data: {
-          subdomain,
-          name,
-          phone,
-          officialId: officialId || null,
-          referredBy: referredBy || null,
-          password: 'password123',
-        }
-      })
-    } catch (innerErr) {
-      console.warn('Fallback: referredBy column issue, creating without referredBy:', innerErr)
-      await prisma.agent.create({
-        data: {
-          subdomain,
-          name,
-          phone,
-          officialId: officialId || null,
-          password: 'password123',
-        }
-      })
-    }
+    // Cipta ejen baru dengan kolum referredBy yang sudah disokong 100% di Supabase
+    await prisma.agent.create({
+      data: {
+        subdomain,
+        name,
+        phone,
+        officialId: officialId || null,
+        referredBy: referredBy || null,
+        password: 'password123',
+      }
+    })
 
     // Revalidate paths for instant live updates
     revalidatePath('/admin')
