@@ -2,25 +2,24 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import CheckoutClient from './CheckoutClient'
 
-export default async function CheckoutPage({ 
-  params,
-  searchParams
-}: { 
-  params: Promise<{ tenant?: string }> | { tenant?: string },
-  searchParams: Promise<{ plan?: string }> | { plan?: string }
-}) {
-  const resolvedParams = await params
-  const resolvedSearchParams = await searchParams
+interface PageProps {
+  params: Promise<{ tenant: string }>
+  searchParams: Promise<{ plan?: string }>
+}
 
-  const tenant = resolvedParams?.tenant
-  const plan = resolvedSearchParams?.plan
+export default async function CheckoutPage(props: PageProps) {
+  const params = await props.params
+  const searchParams = await props.searchParams
+
+  const tenant = params?.tenant?.toLowerCase()
+  const plan = searchParams?.plan
 
   if (!tenant) notFound()
   
   let agent = null
   try {
-    agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant.toLowerCase(), mode: 'insensitive' } }
+    agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant }
     })
   } catch (error) {
     console.error('Database query error:', error)

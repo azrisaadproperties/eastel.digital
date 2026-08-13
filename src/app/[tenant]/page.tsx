@@ -6,9 +6,13 @@ import { PLANS } from '@/lib/plans'
 import PromoHeaderBar from '@/components/PromoHeaderBar'
 import FaqSection from '@/components/FaqSection'
 
-export async function generateMetadata({ params }: { params: Promise<{ tenant?: string }> | { tenant?: string } }): Promise<Metadata> {
-  const resolvedParams = await params
-  const tenant = resolvedParams?.tenant
+interface PageProps {
+  params: Promise<{ tenant: string }>
+}
+
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params
+  const tenant = params?.tenant?.toLowerCase()
 
   if (!tenant) {
     return {
@@ -18,8 +22,8 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant?: 
   }
 
   try {
-    const agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant.toLowerCase(), mode: 'insensitive' } },
+    const agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant },
     })
 
     if (!agent) {
@@ -46,9 +50,9 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant?: 
   }
 }
 
-export default async function AgentPage({ params }: { params: Promise<{ tenant?: string }> | { tenant?: string } }) {
-  const resolvedParams = await params
-  const tenant = resolvedParams?.tenant
+export default async function AgentPage(props: PageProps) {
+  const params = await props.params
+  const tenant = params?.tenant?.toLowerCase()
 
   if (!tenant) {
     notFound()
@@ -56,8 +60,8 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant?:
 
   let agent = null
   try {
-    agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant.toLowerCase(), mode: 'insensitive' } },
+    agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant },
     })
   } catch (error) {
     console.error('Database query error:', error)
