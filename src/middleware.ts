@@ -33,13 +33,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(url.pathname, request.url))
   }
 
-  // Elakkan infinite rewrite loop jika pathname sudah bermula dengan /[subdomain]
-  if (url.pathname.startsWith(`/${subdomain}`)) {
+  // Elakkan loop jika pathname sudah mengandungi subdomain
+  if (url.pathname === `/${subdomain}` || url.pathname.startsWith(`/${subdomain}/`)) {
     return NextResponse.next()
   }
 
+  // Bina target path tanpa double trailing slash
+  const targetPath = url.pathname === '/' ? `/${subdomain}` : `/${subdomain}${url.pathname}`
+
   // Jika ia subdomain khusus (cth: 'ali'), ubah (rewrite) ia ke folder dinamik /[tenant]
-  return NextResponse.rewrite(new URL(`/${subdomain}${url.pathname}`, request.url))
+  return NextResponse.rewrite(new URL(targetPath, request.url))
 }
 
 export const config = {
