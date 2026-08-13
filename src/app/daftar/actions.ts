@@ -28,9 +28,10 @@ export async function registerAgent(formData: FormData) {
   }
 
   try {
-    // Semak jika subdomain sudah wujud
+    // Semak jika subdomain sudah wujud - HANYA SELECT 'id' supaya tidak ralat jika kolum baru belum wujud di DB
     const existing = await prisma.agent.findUnique({
-      where: { subdomain }
+      where: { subdomain },
+      select: { id: true }
     })
 
     if (existing) {
