@@ -31,21 +31,6 @@ export const PLANS: Plan[] = [
     btnClass: 'btn btn-primary btn-pulse'
   },
   {
-    id: 'ez68',
-    name: 'EZ68',
-    price: 'RM68',
-    period: '/ Bulan',
-    dataQuota: '700GB Data 5G',
-    color: '#8B5CF6',
-    features: [
-      'Hotspot Penuh',
-      'Panggilan Tanpa Had',
-      '5GB Roaming (ID, SG, TH)'
-    ],
-    buttonText: 'Beli EZ68',
-    btnClass: 'btn btn-secondary'
-  },
-  {
     id: 'ez35',
     name: 'EZ35',
     price: 'RM35',
