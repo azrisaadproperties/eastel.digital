@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { PLANS } from '@/lib/plans'
+import PromoHeaderBar from '@/components/PromoHeaderBar'
+import FaqSection from '@/components/FaqSection'
 
 export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
   const { tenant } = await params
@@ -45,6 +47,9 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
 
   return (
     <>
+      {/* Promo Announcement Bar */}
+      <PromoHeaderBar />
+
       <div className="bg-blob blob-1"></div>
       <div className="bg-blob blob-3" style={{ opacity: 0.5 }}></div>
 
@@ -117,6 +122,9 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
             ))}
           </div>
         </section>
+
+        {/* FAQ Accordion Section */}
+        <FaqSection />
 
         {/* Footer */}
         <footer className="footer mt-8">

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { PLANS } from '@/lib/plans'
 import { prisma } from '@/lib/prisma'
 import SubdomainToast from '@/components/SubdomainToast'
+import PromoHeaderBar from '@/components/PromoHeaderBar'
+import FaqSection from '@/components/FaqSection'
 
 export default async function Home() {
   // Query 10 latest registered agents for live notification toast
@@ -26,6 +28,9 @@ export default async function Home() {
 
   return (
     <>
+      {/* Top Announcement Bar for Urgency */}
+      <PromoHeaderBar />
+
       <div className="bg-blob blob-1"></div>
       <div className="bg-blob blob-2"></div>
       <div className="bg-blob blob-3"></div>
@@ -164,6 +169,9 @@ export default async function Home() {
             </Link>
           </div>
         </section>
+
+        {/* FAQ Accordion Section */}
+        <FaqSection />
       </main>
 
       {/* Footer */}
