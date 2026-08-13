@@ -12,8 +12,8 @@ export default async function CheckoutPage({
   const { tenant } = await params
   const { plan } = await searchParams
   
-  const agent = await prisma.agent.findUnique({
-    where: { subdomain: tenant }
+  const agent = await prisma.agent.findFirst({
+    where: { subdomain: { equals: tenant, mode: 'insensitive' } }
   })
 
   if (!agent) notFound()

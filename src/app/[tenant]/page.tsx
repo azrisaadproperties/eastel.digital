@@ -8,8 +8,8 @@ import FaqSection from '@/components/FaqSection'
 
 export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
   const { tenant } = await params
-  const agent = await prisma.agent.findUnique({
-    where: { subdomain: tenant },
+  const agent = await prisma.agent.findFirst({
+    where: { subdomain: { equals: tenant, mode: 'insensitive' } },
   })
 
   if (!agent) {
@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
 export default async function AgentPage({ params }: { params: Promise<{ tenant: string }> }) {
   const { tenant } = await params
 
-  const agent = await prisma.agent.findUnique({
-    where: { subdomain: tenant },
+  const agent = await prisma.agent.findFirst({
+    where: { subdomain: { equals: tenant, mode: 'insensitive' } },
   })
 
   if (!agent) {
