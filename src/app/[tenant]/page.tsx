@@ -5,52 +5,14 @@ import { PLANS } from '@/lib/plans'
 import PromoHeaderBar from '@/components/PromoHeaderBar'
 import FaqSection from '@/components/FaqSection'
 
-interface PageProps {
-  params: Promise<{ tenant: string }>
+export const metadata: Metadata = {
+  title: 'Kedai Rakan Niaga Rasmi - Eastel Digital',
+  description: 'Daftar pakej 5G terpantas Eastel Digital hari ini.',
+  alternates: { canonical: 'https://eastel.digital' }
 }
 
-export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  let tenant = ''
-  try {
-    const params = await props.params
-    tenant = params?.tenant?.toLowerCase() || ''
-  } catch (e) {}
-
-  if (!tenant) {
-    return {
-      title: 'Eastel Digital',
-      alternates: { canonical: 'https://eastel.digital' }
-    }
-  }
-
-  try {
-    const agent = await prisma.agent.findUnique({
-      where: { subdomain: tenant },
-      select: { name: true, subdomain: true }
-    })
-
-    if (!agent) {
-      return {
-        title: 'Kedai Tidak Ditemui - Eastel Digital',
-        alternates: { canonical: 'https://eastel.digital' }
-      }
-    }
-
-    return {
-      title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
-      description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
-      alternates: { canonical: 'https://eastel.digital' },
-      openGraph: {
-        title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
-        description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
-      }
-    }
-  } catch (error) {
-    return {
-      title: 'Eastel Digital',
-      alternates: { canonical: 'https://eastel.digital' }
-    }
-  }
+interface PageProps {
+  params: Promise<{ tenant: string }>
 }
 
 export default async function AgentPage(props: PageProps) {
