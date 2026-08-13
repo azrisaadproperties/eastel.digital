@@ -45,6 +45,8 @@ export async function addAgent(formData: FormData) {
       }
     })
     revalidatePath('/admin')
+    revalidatePath('/ejen')
+    revalidatePath('/')
   } catch (error) {
     console.error('Gagal menambah ejen', error)
   }
@@ -54,6 +56,8 @@ export async function deleteAgent(id: string) {
   try {
     await prisma.agent.delete({ where: { id } })
     revalidatePath('/admin')
+    revalidatePath('/ejen')
+    revalidatePath('/')
   } catch (error) {
     console.error('Gagal memadam ejen', error)
   }
