@@ -28,14 +28,9 @@ export async function registerAgent(formData: FormData) {
   }
 
   try {
-    // Semak jika subdomain sudah wujud (case-insensitive check)
-    const existing = await prisma.agent.findFirst({
-      where: {
-        subdomain: {
-          equals: subdomain,
-          mode: 'insensitive'
-        }
-      }
+    // Semak jika subdomain sudah wujud
+    const existing = await prisma.agent.findUnique({
+      where: { subdomain }
     })
 
     if (existing) {
@@ -75,10 +70,6 @@ export async function registerAgent(formData: FormData) {
     return { success: true, subdomain }
   } catch (error: any) {
     console.error('Gagal mendaftar ejen:', error)
-    const errMsg = error?.message || ''
-    if (errMsg.includes('Unique constraint')) {
-      return { error: `Maaf, nama pautan "${subdomain}.eastel.digital" sudah didaftarkan.` }
-    }
-    return { error: 'Gagal membuat pendaftaran. Sila pastikan sambungan internet stabil dan cuba lagi.' }
+    return { error: `Gagal membuat pendaftaran: ${error?.message || 'Ralat pangkalan data'}` }
   }
 }
