@@ -22,8 +22,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   try {
-    const agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+    const agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant },
       select: { name: true, subdomain: true }
     })
 
@@ -61,8 +61,8 @@ export default async function AgentPage(props: PageProps) {
 
   let agent = null
   try {
-    agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+    agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant },
       select: {
         id: true,
         subdomain: true,
@@ -90,7 +90,7 @@ export default async function AgentPage(props: PageProps) {
       <main>
         {/* Agent Exclusive Banner */}
         <div style={{ background: 'var(--gradient-5g)', padding: '0.5rem 1rem', textAlign: 'center', color: 'white', fontWeight: 600, position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-          Pembelian Melalui Wakil Sah: <span style={{ fontWeight: 900 }}>{agent.name.toUpperCase()} {agent.officialId ? `(${agent.officialId})` : ''}</span>
+          Pembelian Melalui Wakil Sah: <span style={{ fontWeight: 900 }}>{(agent.name || '').toUpperCase()} {agent.officialId ? `(${agent.officialId})` : ''}</span>
         </div>
 
         {/* Hero Section */}
@@ -103,7 +103,7 @@ export default async function AgentPage(props: PageProps) {
               fontSize: '2.5rem', fontWeight: 900, margin: '0 auto 1rem auto',
               boxShadow: '0 10px 25px rgba(249, 115, 22, 0.4)'
             }}>
-              {agent.name.charAt(0).toUpperCase()}
+              {(agent.name || 'E').charAt(0).toUpperCase()}
             </div>
             <p style={{ color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Rakan Niaga Eastel</p>
             <h1 style={{ fontSize: '2rem', marginBottom: '0.2rem' }}>{agent.name}</h1>

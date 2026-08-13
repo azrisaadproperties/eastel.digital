@@ -18,8 +18,8 @@ export default async function CheckoutPage(props: PageProps) {
   
   let agent = null
   try {
-    agent = await prisma.agent.findFirst({
-      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+    agent = await prisma.agent.findUnique({
+      where: { subdomain: tenant },
       select: {
         id: true,
         subdomain: true,
