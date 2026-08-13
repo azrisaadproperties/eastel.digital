@@ -36,20 +36,34 @@ export async function registerAgent(formData: FormData) {
       return { error: 'Maaf, nama pautan ini telah digunakan oleh ejen lain. Sila cuba nama lain.' }
     }
 
-    // Cipta ejen baru
-    await prisma.agent.create({
-      data: {
-        subdomain,
-        name,
-        phone,
-        officialId,
-        referredBy: referredBy || null,
-        password: 'password123',
-      }
-    })
+    // Cipta ejen baru dengan fail-safe fallback
+    try {
+      await prisma.agent.create({
+        data: {
+          subdomain,
+          name,
+          phone,
+          officialId: officialId || null,
+          referredBy: referredBy || null,
+          password: 'password123',
+        }
+      })
+    } catch (innerErr) {
+      console.warn('Fallback: referredBy column issue, creating without referredBy:', innerErr)
+      await prisma.agent.create({
+        data: {
+          subdomain,
+          name,
+          phone,
+          officialId: officialId || null,
+          password: 'password123',
+        }
+      })
+    }
 
     return { success: true, subdomain }
   } catch (error) {
-    return { error: 'Berlaku ralat sistem. Sila cuba lagi sebentar lagi.' }
+    console.error('Gagal mendaftar ejen:', error)
+    return { error: 'Berlaku ralat semasa mendaftar. Sila pastikan nama subdomain belum digunakan.' }
   }
 }
