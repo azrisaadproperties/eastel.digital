@@ -220,6 +220,21 @@ p { color: var(--text-muted); font-size: 1.125rem; }
   animation: btnPulse 2s infinite ease-in-out;
 }
 
+/* Toast Notification Styles */
+.subdomain-toast {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.toast-hide {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+}
+
+
 
 .animate-fade-in-up { animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
 .stagger-1 { animation-delay: 0.1s; }

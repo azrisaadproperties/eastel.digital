@@ -1,12 +1,37 @@
 import Link from 'next/link'
 import { PLANS } from '@/lib/plans'
+import { prisma } from '@/lib/prisma'
+import SubdomainToast from '@/components/SubdomainToast'
 
-export default function Home() {
+export default async function Home() {
+  // Query 10 latest registered agents for live notification toast
+  const recentAgents = await prisma.agent.findMany({
+    take: 10,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      subdomain: true,
+      name: true,
+      createdAt: true
+    }
+  })
+
+  const agentCount = await prisma.agent.count()
+
+  // Format dates as strings for Client Component
+  const toastAgents = recentAgents.map(a => ({
+    subdomain: a.subdomain,
+    name: a.name,
+    createdAt: a.createdAt.toISOString()
+  }))
+
   return (
     <>
       <div className="bg-blob blob-1"></div>
       <div className="bg-blob blob-2"></div>
       <div className="bg-blob blob-3"></div>
+
+      {/* Floating Subdomain Toast Notification */}
+      <SubdomainToast agents={toastAgents} />
 
       {/* Navigation */}
       <nav className="navbar">
@@ -14,7 +39,10 @@ export default function Home() {
           <Link href="/" className="logo">
             <span style={{ fontSize: '2rem' }}>⚡</span> Eastel
           </Link>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <Link href="/ejen" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem', borderRadius: '8px' }}>
+              👥 Direktori Ejen ({agentCount})
+            </Link>
             <Link href="#pakej" className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem', borderRadius: '8px' }}>
               Beli Simpack
             </Link>
@@ -46,8 +74,8 @@ export default function Home() {
             <Link href="#pakej" className="btn btn-5g">
               Lihat Pelan EZ Series
             </Link>
-            <Link href="#ejen" className="btn btn-secondary">
-              Sertai Eastelpreneur
+            <Link href="/ejen" className="btn btn-secondary">
+              👥 Lihat {agentCount} Ejen Berdaftar
             </Link>
           </div>
         </section>
@@ -127,9 +155,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex-center mt-8">
+          <div className="flex-center mt-8" style={{ gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/daftar" className="btn btn-primary" style={{ padding: '1.25rem 3rem', fontSize: '1.25rem', borderRadius: '12px' }}>
               Mula Sebagai Eastelpreneur Sekarang 🚀
+            </Link>
+            <Link href="/ejen" className="btn btn-secondary" style={{ padding: '1.25rem 2.5rem', fontSize: '1.1rem', borderRadius: '12px' }}>
+              👥 Lihat Direktori Subdomain ({agentCount})
             </Link>
           </div>
         </section>
@@ -139,6 +170,7 @@ export default function Home() {
       <footer className="footer">
         <div className="container">
           <div className="footer-links">
+            <Link href="/ejen">Direktori Ejen ({agentCount})</Link>
             <Link href="/update">Kemaskini Profil Ejen</Link>
             <Link href="/admin">Admin Portal</Link>
             <a href="#">Terma & Syarat</a>
