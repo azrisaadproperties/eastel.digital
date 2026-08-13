@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { PLANS } from '@/lib/plans'
 
 export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
   const { tenant } = await params
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
     title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
     description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
     alternates: {
-      canonical: 'https://eastel.digital' // Elakkan duplicate content SEO penalty!
+      canonical: 'https://eastel.digital'
     },
     openGraph: {
       title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
@@ -34,7 +35,6 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
 export default async function AgentPage({ params }: { params: Promise<{ tenant: string }> }) {
   const { tenant } = await params
 
-  // 1. Dapatkan profil ejen berdasarkan subdomain
   const agent = await prisma.agent.findUnique({
     where: { subdomain: tenant },
   })
@@ -55,19 +55,18 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
         </div>
 
         {/* Hero Section */}
-        <section className="section container flex-col flex-center text-center animate-fade-in-up" style={{ minHeight: '60vh', padding: '6rem 1rem 4rem 1rem' }}>
-          
-          <div className="glass-card stagger-1" style={{ padding: '2rem', marginBottom: '3rem', maxWidth: '500px', width: '100%', border: '2px solid rgba(236, 72, 153, 0.3)' }}>
+        <section className="section container flex-col flex-center text-center animate-fade-in-up" style={{ minHeight: '50vh', padding: '4rem 1rem 2rem 1rem' }}>
+          <div className="glass-card stagger-1" style={{ padding: '2rem', marginBottom: '2rem', maxWidth: '500px', width: '100%', border: '2px solid rgba(236, 72, 153, 0.3)' }}>
             <div style={{ 
-              width: '100px', height: '100px', borderRadius: '50%', 
+              width: '80px', height: '80px', borderRadius: '50%', 
               background: 'var(--gradient-brand)', color: 'white', 
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '3rem', fontWeight: 900, margin: '0 auto 1.5rem auto',
+              fontSize: '2.5rem', fontWeight: 900, margin: '0 auto 1rem auto',
               boxShadow: '0 10px 25px rgba(249, 115, 22, 0.4)'
             }}>
               {agent.name.charAt(0).toUpperCase()}
             </div>
-            <p style={{ color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>Rakan Niaga Eastel</p>
+            <p style={{ color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Rakan Niaga Eastel</p>
             <h1 style={{ fontSize: '2rem', marginBottom: '0.2rem' }}>{agent.name}</h1>
             {agent.officialId && (
               <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.8rem', borderRadius: '12px', fontSize: '0.8rem', color: 'var(--text-main)', marginBottom: '1rem', border: '1px solid rgba(255,255,255,0.2)' }}>
@@ -76,76 +75,46 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
             )}
             <p style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>"Saya sedia membantu anda mendaftar pelan Eastel 5G hari ini."</p>
           </div>
-          
+
           <h2 className="mb-4 stagger-2">Pilih Pakej <span className="text-gradient-5g">5G Terpantas</span> Anda</h2>
           <p className="mb-8 stagger-3" style={{ maxWidth: '600px', fontSize: '1.2rem' }}>
             Nikmati kelajuan tanpa had dan kebebasan hotspot sebenar. Semua pendaftaran diuruskan secara rasmi oleh sistem HQ.
           </p>
         </section>
 
-        {/* Packages Section (Duplicated from main but tracking agent) */}
+        {/* Packages Section */}
         <section id="pakej" className="section container" style={{ paddingTop: '0' }}>
           <div className="grid-4 stagger-4">
-            
-            {/* EZ15 */}
-            <div className="glass-card">
-              <h3 style={{ color: 'var(--text-muted)' }}>EZ15</h3>
-              <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                RM15 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ 15 Hari</span>
+            {PLANS.map((plan) => (
+              <div key={plan.id} className={`glass-card ${plan.isPopular ? 'card-popular' : ''}`}>
+                {plan.badge && <div className="card-badge">{plan.badge}</div>}
+                <h3 style={{ color: plan.color }}>{plan.name}</h3>
+                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
+                  {plan.price} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>{plan.period}</span>
+                </div>
+                <div style={{ 
+                  background: plan.isPopular ? 'var(--gradient-brand)' : 'rgba(59, 130, 246, 0.1)', 
+                  color: plan.isPopular ? 'white' : plan.color, 
+                  padding: '0.5rem', 
+                  borderRadius: '8px', 
+                  textAlign: 'center', 
+                  fontWeight: 700, 
+                  marginBottom: '1.5rem' 
+                }}>
+                  {plan.dataQuota}
+                </div>
+                <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
+                  {plan.features.map((feat, i) => (
+                    <li key={i}>
+                      <span className="check-icon" style={{ color: plan.color }}>✓</span> {feat}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={`/checkout?plan=${plan.id}&ref=${tenant}`} className={plan.btnClass} style={{ width: '100%', borderRadius: '8px' }}>
+                  {plan.buttonText}
+                </Link>
               </div>
-              <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>30GB Data</div>
-              <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                <li><span className="check-icon">✓</span> Hotspot Penuh</li>
-                <li><span className="check-icon">✓</span> Panggilan Tanpa Had</li>
-              </ul>
-              <Link href={`/checkout?plan=ez15&ref=${tenant}`} className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ15</Link>
-            </div>
-
-            {/* EZ35 */}
-            <div className="glass-card">
-              <h3 style={{ color: 'var(--text-muted)' }}>EZ35</h3>
-              <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                RM35 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-              </div>
-              <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>200GB Data</div>
-              <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                <li><span className="check-icon">✓</span> 100GB Hotspot</li>
-                <li><span className="check-icon">✓</span> Panggilan Tanpa Had</li>
-                <li><span className="check-icon">✓</span> Carry Forward</li>
-              </ul>
-              <Link href={`/checkout?plan=ez35&ref=${tenant}`} className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ35</Link>
-            </div>
-
-            {/* EZ50 */}
-            <div className="glass-card card-popular">
-              <div className="card-badge">Pilihan Ramai</div>
-              <h3 style={{ color: 'var(--primary)' }}>EZ50</h3>
-              <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                RM50 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-              </div>
-              <div style={{ background: 'var(--gradient-brand)', color: 'white', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>500GB Data 5G</div>
-              <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> Hotspot Penuh</li>
-                <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> Panggilan Tanpa Had</li>
-                <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> 3GB Roaming</li>
-              </ul>
-              <Link href={`/checkout?plan=ez50&ref=${tenant}`} className="btn btn-primary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ50</Link>
-            </div>
-
-            {/* EZ68 */}
-            <div className="glass-card">
-              <h3 style={{ color: 'var(--text-muted)' }}>EZ68</h3>
-              <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                RM68 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-              </div>
-              <div style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8B5CF6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>700GB Data 5G</div>
-              <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> Hotspot Penuh</li>
-                <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> Panggilan Tanpa Had</li>
-                <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> 5GB Roaming</li>
-              </ul>
-              <Link href={`/checkout?plan=ez68&ref=${tenant}`} className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ68</Link>
-            </div>
+            ))}
           </div>
         </section>
 

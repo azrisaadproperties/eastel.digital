@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { PLANS } from '@/lib/plans'
 
 export default function Home() {
   return (
@@ -60,75 +61,36 @@ export default function Home() {
             </div>
 
             <div className="grid-4">
-              
-              {/* EZ15 */}
-              <div className="glass-card">
-                <h3 style={{ color: 'var(--text-muted)' }}>EZ15</h3>
-                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                  RM15 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ 15 Hari</span>
+              {PLANS.map((plan) => (
+                <div key={plan.id} className={`glass-card ${plan.isPopular ? 'card-popular' : ''}`}>
+                  {plan.badge && <div className="card-badge">{plan.badge}</div>}
+                  <h3 style={{ color: plan.color }}>{plan.name}</h3>
+                  <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
+                    {plan.price} <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>{plan.period}</span>
+                  </div>
+                  <div style={{ 
+                    background: plan.isPopular ? 'var(--gradient-brand)' : 'rgba(59, 130, 246, 0.1)', 
+                    color: plan.isPopular ? 'white' : plan.color, 
+                    padding: '0.5rem', 
+                    borderRadius: '8px', 
+                    textAlign: 'center', 
+                    fontWeight: 700, 
+                    marginBottom: '1.5rem' 
+                  }}>
+                    {plan.dataQuota}
+                  </div>
+                  <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
+                    {plan.features.map((feat, i) => (
+                      <li key={i}>
+                        <span className="check-icon" style={{ color: plan.color }}>✓</span> {feat}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href={`/checkout?plan=${plan.id}`} className={plan.btnClass} style={{ width: '100%', borderRadius: '8px' }}>
+                    {plan.buttonText}
+                  </Link>
                 </div>
-                <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>
-                  30GB Data
-                </div>
-                <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                  <li><span className="check-icon">✓</span> Hotspot Penuh</li>
-                  <li><span className="check-icon">✓</span> Panggilan Tanpa Had</li>
-                </ul>
-                <Link href="/checkout?plan=ez15" className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ15</Link>
-              </div>
-
-              {/* EZ35 */}
-              <div className="glass-card">
-                <h3 style={{ color: 'var(--text-muted)' }}>EZ35</h3>
-                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                  RM35 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-                </div>
-                <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>
-                  200GB Data
-                </div>
-                <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                  <li><span className="check-icon">✓</span> 100GB Hotspot</li>
-                  <li><span className="check-icon">✓</span> Panggilan Tanpa Had</li>
-                  <li><span className="check-icon">✓</span> Boleh Carry Forward Data</li>
-                </ul>
-                <Link href="/checkout?plan=ez35" className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ35</Link>
-              </div>
-
-              {/* EZ50 (Popular) */}
-              <div className="glass-card card-popular">
-                <div className="card-badge">Pilihan Ramai</div>
-                <h3 style={{ color: 'var(--primary)' }}>EZ50</h3>
-                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                  RM50 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-                </div>
-                <div style={{ background: 'var(--gradient-brand)', color: 'white', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>
-                  500GB Data 5G
-                </div>
-                <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                  <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> Hotspot Penuh</li>
-                  <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> Panggilan Tanpa Had</li>
-                  <li><span className="check-icon" style={{ color: 'var(--primary)' }}>✓</span> 3GB Roaming (ID, SG, TH)</li>
-                </ul>
-                <Link href="/checkout?plan=ez50" className="btn btn-primary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ50</Link>
-              </div>
-
-              {/* EZ68 */}
-              <div className="glass-card">
-                <h3 style={{ color: 'var(--text-muted)' }}>EZ68</h3>
-                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--text-main)', marginBottom: '1rem', lineHeight: 1 }}>
-                  RM68 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ Bulan</span>
-                </div>
-                <div style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8B5CF6', padding: '0.5rem', borderRadius: '8px', textAlign: 'center', fontWeight: 700, marginBottom: '1.5rem' }}>
-                  700GB Data 5G
-                </div>
-                <ul className="check-list" style={{ listStyle: 'none', marginBottom: '2rem', minHeight: '150px' }}>
-                  <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> Hotspot Penuh</li>
-                  <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> Panggilan Tanpa Had</li>
-                  <li><span className="check-icon" style={{ color: '#8B5CF6' }}>✓</span> 5GB Roaming (ID, SG, TH)</li>
-                </ul>
-                <Link href="/checkout?plan=ez68" className="btn btn-secondary" style={{ width: '100%', borderRadius: '8px' }}>Beli EZ68</Link>
-              </div>
-
+              ))}
             </div>
           </div>
         </section>
