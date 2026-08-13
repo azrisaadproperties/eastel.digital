@@ -6,40 +6,62 @@ import { PLANS } from '@/lib/plans'
 import PromoHeaderBar from '@/components/PromoHeaderBar'
 import FaqSection from '@/components/FaqSection'
 
-export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
-  const { tenant } = await params
-  const agent = await prisma.agent.findFirst({
-    where: { subdomain: { equals: tenant, mode: 'insensitive' } },
-  })
+export async function generateMetadata({ params }: { params: Promise<{ tenant?: string }> | { tenant?: string } }): Promise<Metadata> {
+  const resolvedParams = await params
+  const tenant = resolvedParams?.tenant
 
-  if (!agent) {
+  if (!tenant) {
     return {
       title: 'Kedai Tidak Ditemui',
-      alternates: {
-        canonical: 'https://eastel.digital'
-      }
+      alternates: { canonical: 'https://eastel.digital' }
     }
   }
 
-  return {
-    title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
-    description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
-    alternates: {
-      canonical: 'https://eastel.digital'
-    },
-    openGraph: {
+  try {
+    const agent = await prisma.agent.findFirst({
+      where: { subdomain: { equals: tenant.toLowerCase(), mode: 'insensitive' } },
+    })
+
+    if (!agent) {
+      return {
+        title: 'Kedai Tidak Ditemui',
+        alternates: { canonical: 'https://eastel.digital' }
+      }
+    }
+
+    return {
       title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
       description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
+      alternates: { canonical: 'https://eastel.digital' },
+      openGraph: {
+        title: `Kedai Rasmi ${agent.name} - Eastel Digital`,
+        description: `Selamat datang ke Kedai Rakan Niaga Rasmi Eastel: ${agent.name}. Daftar pakej 5G hari ini.`,
+      }
+    }
+  } catch (error) {
+    return {
+      title: 'Eastel Digital',
+      alternates: { canonical: 'https://eastel.digital' }
     }
   }
 }
 
-export default async function AgentPage({ params }: { params: Promise<{ tenant: string }> }) {
-  const { tenant } = await params
+export default async function AgentPage({ params }: { params: Promise<{ tenant?: string }> | { tenant?: string } }) {
+  const resolvedParams = await params
+  const tenant = resolvedParams?.tenant
 
-  const agent = await prisma.agent.findFirst({
-    where: { subdomain: { equals: tenant, mode: 'insensitive' } },
-  })
+  if (!tenant) {
+    notFound()
+  }
+
+  let agent = null
+  try {
+    agent = await prisma.agent.findFirst({
+      where: { subdomain: { equals: tenant.toLowerCase(), mode: 'insensitive' } },
+    })
+  } catch (error) {
+    console.error('Database query error:', error)
+  }
 
   if (!agent) {
     notFound()
@@ -115,7 +137,7 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
                     </li>
                   ))}
                 </ul>
-                <Link href={`/checkout?plan=${plan.id}&ref=${tenant}`} className={plan.btnClass} style={{ width: '100%', borderRadius: '8px' }}>
+                <Link href={`/checkout?plan=${plan.id}&ref=${agent.subdomain}`} className={plan.btnClass} style={{ width: '100%', borderRadius: '8px' }}>
                   {plan.buttonText}
                 </Link>
               </div>
@@ -130,7 +152,7 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
         <footer className="footer mt-8">
           <div className="container">
             <div className="flex-center flex-col">
-              <Link href={`/daftar?ref=${tenant}`} style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', marginBottom: '1rem' }}>
+              <Link href={`/daftar?ref=${agent.subdomain}`} style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', marginBottom: '1rem' }}>
                 Berminat jana income seperti {agent.name}? Daftar Ejen Di Sini
               </Link>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>© {new Date().getFullYear()} Eastel Digital. Rangkaian Dikuasakan oleh U Mobile.</p>
