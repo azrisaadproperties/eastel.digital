@@ -6,6 +6,7 @@ export async function registerAgent(formData: FormData) {
   const name = formData.get('name') as string
   const phone = formData.get('phone') as string
   const officialId = formData.get('officialId') as string
+  const referredBy = formData.get('referredBy') as string | null
   let subdomain = formData.get('subdomain') as string
 
   if (!name || !phone || !subdomain) {
@@ -20,7 +21,7 @@ export async function registerAgent(formData: FormData) {
   }
 
   // Semak jika larangan nama (reserved names)
-  const reserved = ['admin', 'login', 'daftar', 'api', 'www', 'eastel', 'hq']
+  const reserved = ['admin', 'login', 'daftar', 'api', 'www', 'eastel', 'hq', 'ejen']
   if (reserved.includes(subdomain)) {
     return { error: 'Nama subdomain ini tidak dibenarkan. Sila pilih yang lain.' }
   }
@@ -42,7 +43,8 @@ export async function registerAgent(formData: FormData) {
         name,
         phone,
         officialId,
-        password: 'password123', // Boleh ditukar jika ada sistem login ejen nanti
+        referredBy: referredBy || null,
+        password: 'password123',
       }
     })
 

@@ -130,7 +130,7 @@ export default async function AgentPage({ params }: { params: Promise<{ tenant: 
         <footer className="footer mt-8">
           <div className="container">
             <div className="flex-center flex-col">
-              <Link href="/daftar" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', marginBottom: '1rem' }}>
+              <Link href={`/daftar?ref=${tenant}`} style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', marginBottom: '1rem' }}>
                 Berminat jana income seperti {agent.name}? Daftar Ejen Di Sini
               </Link>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>© {new Date().getFullYear()} Eastel Digital. Rangkaian Dikuasakan oleh U Mobile.</p>

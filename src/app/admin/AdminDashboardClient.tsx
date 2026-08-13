@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { addAgent, deleteAgent, updateContent, loginAdmin, logoutAdmin } from './actions'
 
-type Agent = { id: string, subdomain: string, name: string, phone: string | null, officialId: string | null, createdAt: Date }
+type Agent = { id: string, subdomain: string, name: string, phone: string | null, officialId: string | null, referredBy?: string | null, createdAt: Date }
 type Content = { id: string, headline: string, subheadline: string, description: string, paymentDetails: string, webhookUrl: string | null }
 type Order = { id: string, name: string, phone: string, address: string, plan: string, agentSubdomain: string, agentOfficialId: string | null, createdAt: Date }
 
@@ -157,6 +157,11 @@ export default function AdminDashboardClient({
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
                     Tel: {agent.phone || '-'} • Daftar: {new Date(agent.createdAt).toLocaleDateString('ms-MY')}
+                    {agent.referredBy && (
+                      <div style={{ color: '#10B981', fontSize: '0.8rem', fontWeight: 700, marginTop: '0.2rem' }}>
+                        🤝 Upline: {agent.referredBy}.eastel.digital
+                      </div>
+                    )}
                   </div>
                   <a href={`https://${agent.subdomain}.eastel.digital`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', background: 'var(--bg-secondary)', padding: '0.4rem 0.8rem', borderRadius: '6px', color: 'var(--primary)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, border: '1px solid var(--border-color)' }}>
                     {agent.subdomain}.eastel.digital ↗

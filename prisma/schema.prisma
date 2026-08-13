@@ -15,6 +15,7 @@ model Agent {
   phone      String?
   officialId String?  // ID Rujukan Rasmi dari App Eastel
   password   String   
+  referredBy String?  // Subdomain ejen atasan (upline)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
