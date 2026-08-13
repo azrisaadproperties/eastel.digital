@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
 
 export async function registerAgent(formData: FormData) {
   const name = formData.get('name') as string
@@ -10,30 +11,35 @@ export async function registerAgent(formData: FormData) {
   let subdomain = formData.get('subdomain') as string
 
   if (!name || !phone || !subdomain) {
-    return { error: 'Sila isi semua ruangan yang diwajibkan.' }
+    return { error: 'Sila isi semua ruangan yang diwajibkan (Nama, No. Telefon & Subdomain).' }
   }
 
   // Bersihkan subdomain (hanya huruf kecil dan nombor, tiada jarak atau simbol)
   subdomain = subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')
 
   if (subdomain.length < 3) {
-    return { error: 'Subdomain mestilah sekurang-kurangnya 3 huruf.' }
+    return { error: 'Subdomain mestilah sekurang-kurangnya 3 huruf atau nombor.' }
   }
 
   // Semak jika larangan nama (reserved names)
-  const reserved = ['admin', 'login', 'daftar', 'api', 'www', 'eastel', 'hq', 'ejen']
+  const reserved = ['admin', 'login', 'daftar', 'api', 'www', 'eastel', 'hq', 'ejen', 'checkout', 'update', 'status']
   if (reserved.includes(subdomain)) {
-    return { error: 'Nama subdomain ini tidak dibenarkan. Sila pilih yang lain.' }
+    return { error: 'Nama subdomain ini dikhaskan untuk sistem. Sila pilih nama yang lain.' }
   }
 
   try {
-    // Semak jika subdomain sudah wujud
-    const existing = await prisma.agent.findUnique({
-      where: { subdomain }
+    // Semak jika subdomain sudah wujud (case-insensitive check)
+    const existing = await prisma.agent.findFirst({
+      where: {
+        subdomain: {
+          equals: subdomain,
+          mode: 'insensitive'
+        }
+      }
     })
 
     if (existing) {
-      return { error: 'Maaf, nama pautan ini telah digunakan oleh ejen lain. Sila cuba nama lain.' }
+      return { error: `Maaf, nama pautan "${subdomain}.eastel.digital" telah digunakan. Sila pilih nama lain.` }
     }
 
     // Cipta ejen baru dengan fail-safe fallback
@@ -61,9 +67,18 @@ export async function registerAgent(formData: FormData) {
       })
     }
 
+    // Revalidate paths for instant live updates
+    revalidatePath('/admin')
+    revalidatePath('/ejen')
+    revalidatePath('/')
+
     return { success: true, subdomain }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gagal mendaftar ejen:', error)
-    return { error: 'Berlaku ralat semasa mendaftar. Sila pastikan nama subdomain belum digunakan.' }
+    const errMsg = error?.message || ''
+    if (errMsg.includes('Unique constraint')) {
+      return { error: `Maaf, nama pautan "${subdomain}.eastel.digital" sudah didaftarkan.` }
+    }
+    return { error: 'Gagal membuat pendaftaran. Sila pastikan sambungan internet stabil dan cuba lagi.' }
   }
 }
