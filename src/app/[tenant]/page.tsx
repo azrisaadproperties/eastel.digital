@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { Metadata } from 'next'
@@ -11,12 +10,15 @@ interface PageProps {
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const params = await props.params
-  const tenant = params?.tenant?.toLowerCase()
+  let tenant = ''
+  try {
+    const params = await props.params
+    tenant = params?.tenant?.toLowerCase() || ''
+  } catch (e) {}
 
   if (!tenant) {
     return {
-      title: 'Kedai Tidak Ditemui',
+      title: 'Eastel Digital',
       alternates: { canonical: 'https://eastel.digital' }
     }
   }
@@ -29,7 +31,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
     if (!agent) {
       return {
-        title: 'Kedai Tidak Ditemui',
+        title: 'Kedai Tidak Ditemui - Eastel Digital',
         alternates: { canonical: 'https://eastel.digital' }
       }
     }
@@ -52,31 +54,46 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function AgentPage(props: PageProps) {
-  const params = await props.params
-  const tenant = params?.tenant?.toLowerCase()
-
-  if (!tenant) {
-    notFound()
-  }
-
-  let agent = null
+  let tenant = ''
   try {
-    agent = await prisma.agent.findUnique({
-      where: { subdomain: tenant },
-      select: {
-        id: true,
-        subdomain: true,
-        name: true,
-        phone: true,
-        officialId: true
-      }
-    })
-  } catch (error) {
-    console.error('Database query error:', error)
+    const params = await props.params
+    tenant = params?.tenant?.toLowerCase() || ''
+  } catch (e) {}
+
+  let agent: { id: string; subdomain: string; name: string; phone: string | null; officialId: string | null } | null = null
+
+  if (tenant) {
+    try {
+      agent = await prisma.agent.findUnique({
+        where: { subdomain: tenant },
+        select: {
+          id: true,
+          subdomain: true,
+          name: true,
+          phone: true,
+          officialId: true
+        }
+      })
+    } catch (error) {
+      console.error('Database query error:', error)
+    }
   }
 
   if (!agent) {
-    notFound()
+    return (
+      <main className="container flex-center text-center" style={{ minHeight: '80vh', padding: '4rem 1rem' }}>
+        <div className="glass-card" style={{ padding: '3rem', maxWidth: '500px', width: '100%' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🏪</div>
+          <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Kedai Tidak Ditemui</h1>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1.1rem' }}>
+            Maaf, kedai rakan niaga <strong>{tenant || 'subdomain'}.eastel.digital</strong> tidak wujud atau telah dipadam.
+          </p>
+          <Link href="https://eastel.digital" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
+            Kembali Ke Laman Utama Eastel
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   return (
