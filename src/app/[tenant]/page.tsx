@@ -22,8 +22,9 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   try {
-    const agent = await prisma.agent.findUnique({
-      where: { subdomain: tenant },
+    const agent = await prisma.agent.findFirst({
+      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+      select: { name: true, subdomain: true }
     })
 
     if (!agent) {
@@ -60,8 +61,15 @@ export default async function AgentPage(props: PageProps) {
 
   let agent = null
   try {
-    agent = await prisma.agent.findUnique({
-      where: { subdomain: tenant },
+    agent = await prisma.agent.findFirst({
+      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+      select: {
+        id: true,
+        subdomain: true,
+        name: true,
+        phone: true,
+        officialId: true
+      }
     })
   } catch (error) {
     console.error('Database query error:', error)

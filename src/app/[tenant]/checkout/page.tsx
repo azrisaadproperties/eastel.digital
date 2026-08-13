@@ -18,8 +18,15 @@ export default async function CheckoutPage(props: PageProps) {
   
   let agent = null
   try {
-    agent = await prisma.agent.findUnique({
-      where: { subdomain: tenant }
+    agent = await prisma.agent.findFirst({
+      where: { subdomain: { equals: tenant, mode: 'insensitive' } },
+      select: {
+        id: true,
+        subdomain: true,
+        name: true,
+        phone: true,
+        officialId: true
+      }
     })
   } catch (error) {
     console.error('Database query error:', error)
