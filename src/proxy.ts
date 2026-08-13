@@ -4,25 +4,22 @@ import type { NextRequest } from 'next/server'
 export function proxy(request: NextRequest) {
   const url = request.nextUrl
 
-  // Dapatkan hostname (contoh: 'ali.localhost:3000' atau 'eastel.digital')
+  // Dapatkan hostname (contoh: 'ali.localhost:3000' atau 'azrisaad.eastel.digital')
   let hostname = request.headers.get('host') || ''
 
   // Untuk pembangunan tempatan, buang port (:3000)
   hostname = hostname.replace(/:\d+$/, '')
 
   // Tentukan root domain
-  // Benarkan .vercel.app beroperasi sebagai domain utama untuk tujuan pengujian sementara DNS bertukar
   const rootDomain = process.env.NODE_ENV === 'production' 
     ? (hostname.includes('vercel.app') ? hostname : 'eastel.digital') 
     : 'localhost'
 
   // Cari subdomain
-  // Jika hostname adalah ali.localhost, subdomain = 'ali'
-  // Jika hostname adalah localhost, subdomain = 'localhost' (tiada subdomain sebenar)
-  let subdomain = hostname.replace(`.${rootDomain}`, '')
+  let subdomain = hostname.replace(`.${rootDomain}`, '').toLowerCase()
 
   // Jika tiada subdomain (hanya root domain), benarkan laluan biasa (NextResponse.next)
-  if (subdomain === rootDomain) {
+  if (subdomain === rootDomain || subdomain === 'eastel.digital' || subdomain === 'www') {
     return NextResponse.next()
   }
 
@@ -32,17 +29,24 @@ export function proxy(request: NextRequest) {
   }
 
   // Pengecualian: benarkan laluan global walaupun berada di subdomain
-  if (url.pathname === '/daftar' || url.pathname === '/update' || url.pathname.startsWith('/admin')) {
+  if (url.pathname === '/daftar' || url.pathname === '/update' || url.pathname === '/ejen' || url.pathname.startsWith('/admin')) {
     return NextResponse.rewrite(new URL(url.pathname, request.url))
   }
 
-  // Jika ia subdomain khusus (cth: 'ali'), ubah (rewrite) ia ke folder dinamik /[tenant]`
-  return NextResponse.rewrite(new URL(`/${subdomain}${url.pathname}`, request.url))
+  // Elakkan loop jika pathname sudah mengandungi subdomain
+  if (url.pathname === `/${subdomain}` || url.pathname.startsWith(`/${subdomain}/`)) {
+    return NextResponse.next()
+  }
+
+  // Bina target path tanpa double trailing slash
+  const targetPath = url.pathname === '/' ? `/${subdomain}` : `/${subdomain}${url.pathname}`
+
+  // Jika ia subdomain khusus (cth: 'ali'), ubah (rewrite) ia ke folder dinamik /[tenant]
+  return NextResponse.rewrite(new URL(targetPath, request.url))
 }
 
 export const config = {
   matcher: [
-    // Jalankan middleware ini pada setiap path kecuali fail statik dan API
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
