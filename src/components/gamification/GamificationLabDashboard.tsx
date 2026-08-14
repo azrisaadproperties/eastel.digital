@@ -12,10 +12,9 @@ import {
   ShieldCheck,
   Swords,
   Gift,
-  LayoutDashboard,
-  ShieldAlert,
 } from 'lucide-react'
 import { checkSupabaseConnection, SupabaseStatus } from '@/lib/supabase'
+import NotificationSystem from '@/components/notifications/NotificationSystem'
 import TerritoryWar from './TerritoryWar'
 import RankUpBom from './RankUpBom'
 import MysteryLootBox from './MysteryLootBox'
@@ -62,7 +61,7 @@ export default function GamificationLabDashboard() {
 
       {/* Top Header Navigation */}
       <header className="sticky top-0 z-40 bg-[#030712]/90 backdrop-blur-2xl border-b border-slate-800/80">
-        <div className="max-w-[1700px] mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
+        <div className="max-w-[1700px] mx-auto px-4 md:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/30">
               <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
@@ -80,8 +79,12 @@ export default function GamificationLabDashboard() {
             </div>
           </div>
 
-          {/* Database Connection Pill */}
-          <div className="flex items-center gap-3">
+          {/* Database & Notification Controls */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Realtime In-App Notification System */}
+            <NotificationSystem />
+
+            {/* Supabase Status Pill */}
             <div
               className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold backdrop-blur-md transition-all ${
                 dbStatus.status === 'Ready'
@@ -172,7 +175,7 @@ export default function GamificationLabDashboard() {
                   <CheckCircle className="w-4 h-4 text-emerald-400" />
                   Live Preview Graphic Rendered
                 </span>
-                <span className="text-purple-400 font-mono text-[10px]">SUPABASE SYNC OK</span>
+                <span className="text-purple-400 font-mono text-[10px]">SUPABASE REALTIME NOTIFICATIONS ACTIVE</span>
               </div>
             </div>
           </div>
@@ -213,7 +216,7 @@ export default function GamificationLabDashboard() {
             <span className="text-slate-600">•</span>
             <span className="text-purple-400 font-bold">Tailwind CSS</span>
             <span className="text-slate-600">•</span>
-            <span className="text-emerald-400 font-bold">Supabase DB</span>
+            <span className="text-emerald-400 font-bold">Supabase Realtime</span>
           </div>
         </div>
       </footer>
