@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 }
 
 export default function GamificationLabPage() {
-  return <GamificationLabDashboard />
+  return (
+    <div className="dark bg-[#030712] text-slate-100 min-h-screen font-sans selection:bg-purple-500 selection:text-white">
+      <GamificationLabDashboard />
+    </div>
+  )
 }
